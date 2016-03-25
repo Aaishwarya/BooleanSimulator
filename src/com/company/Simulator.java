@@ -2,58 +2,122 @@
 import java.lang.String;
 import java.io.LineNumberReader;
 import java.io.FileReader;
-import java.io.BufferedReader;
 import java.util.regex.*;
 import java.lang.Integer;
 
 public class Simulator
 {
     static String gates[]=new String[101];
-    static int isgatenumber[]=new int[101];
-
+    static int isGateOutput[]=new int[101];
+    static String primeInputs[];
+    static int count;
+    
+    public Simulator(String str)
+    {
+        primeInputs=str.split("\\s");
+    }
+    
     public static void main(String args[])throws Exception
     {
-        BufferedReader netList=new BufferedReader(new FileReader("./netlist.txt"));
-        LineNumberReader lineIndex=new LineNumberReader(netList);
-        Simulator obj=new Simulator();
-
-        int count=0,fcount=0;
-        String gate="a";
-        while((gate=lineIndex.readLine())!=null)
+        LineNumberReader netLineIndex=new LineNumberReader(new FileReader("./netlist.txt"));
+        LineNumberReader inputLineIndex=new LineNumberReader(new FileReader("./inputlist.txt"));
+        Simulator obj=new Simulator("");
+        
+        String gate="a",ginput="a";
+        while((gate=netLineIndex.readLine())!=null)
         {
-            count=lineIndex.getLineNumber()-1;
+            count=netLineIndex.getLineNumber()-1;
             gates[count]=gate;
         }
-        int n=count+1;
-        System.out.println("Total number of gates are: "+(count+1));
-        for(int i=0;i<n;i++)
+        System.out.println("Total number of gates are: "+(count+1)+"\n");
+        obj.printStatistics();
+        
+        while((ginput=inputLineIndex.readLine())!=null)
         {
-            System.out.println(gates[i]);
-            if(gates[i]!=null)
-            {
-                fcount=obj.printStatistics(i,n);
-            }
-            System.out.println("Fanout in gate number: "+i+" is "+fcount);
+            Simulator obj2=new Simulator(ginput);
+            obj2.printOutput();
         }
-
+        
     }
-
-    public static int printStatistics(int gnum,int maxgnum)
+    
+    String gatetype[]=new String[count+1];
+    public static void printStatistics()
     {
-        int count=0;
-        for(int i=0;i<maxgnum;i++)
+        for(int gnum=0;gnum<=count;gnum++)
         {
-            if(i==gnum)continue;
-            String result[]=gates[i].split("\\s");
-            for(int j=2;j<result.length;j++)
+            int fcount=0;
+            for(int i=0;i<=count;i++)
             {
-                if(result[j].startsWith("I")==false)
+                if(i==gnum)continue;
+                String result[]=gates[i].split("\\s");
+                for(int j=2;j<result.length;j++)
                 {
-                    int input=Integer.parseInt(result[j]);
-                    if(input==gnum)count++;
+                    if(result[j].startsWith("I")==false)
+                    {
+                        int input=Integer.parseInt(result[j]);
+                        if(input==gnum)fcount++;
+                    }
                 }
             }
+            System.out.println("Fanout of gate "+gnum+" is "+fcount);
         }
-        return count;
+    }
+    
+    public static void printOutput()
+    {
+        for(int i=0;i<=count;i++)
+        {
+            String result[]=gates[i].split("\\s");
+            String gtype=result[1].toUpperCase();
+            boolean inputs[]=new boolean[2];
+            int inum=0;
+            boolean boutput=false;
+            for(int j=2,k=0;j<=3;j++,k++)
+            {
+                int temp=0;
+                if(result[j].startsWith("I"))
+                {
+                    temp=Integer.parseInt(primeInputs[Integer.parseInt((result[j].substring(1,result[j].length())))]);
+                }
+                else temp=isGateOutput[Integer.parseInt(result[j])];
+                if(temp==0)inputs[k]=false;
+                else inputs[k]=true;
+                if(gtype.equals("NOT"))
+                {break;}
+            }
+            
+            if(gtype.equals("NOT"))
+            {
+                boutput=!(inputs[inum++]);
+            }
+            else if(gtype.equals("AND"))
+            {
+                boutput=(inputs[inum++]&&inputs[inum]);
+            }
+            else if(gtype.equals("OR"))
+            {
+                boutput=(inputs[inum++]||inputs[inum]);
+            }
+            else if(gtype.equals("NAND"))
+            {
+                boutput=!(inputs[inum++]&&inputs[inum]);
+            }
+            else if(gtype.equals("NOR"))
+            {
+                boutput=!(inputs[inum++]||inputs[inum]);
+            }
+            else if(gtype.equals("EXOR"))
+            {
+                if(inputs[inum]==inputs[++inum]) boutput=false;
+                else boutput=true;
+            }
+            isGateOutput[i]=((boutput==true)?1:0);
+            System.out.print(isGateOutput[i]+" ");
+        }
+        System.out.println("");
+        
+        
+        
+        
     }
 }
