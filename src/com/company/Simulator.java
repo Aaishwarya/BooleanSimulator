@@ -1,9 +1,9 @@
 
-import java.lang.String; //package imported to use String class
-import java.io.LineNumberReader; //Package imported to read a file line by line
-import java.io.FileReader; //package imported to read a file
-import java.util.regex.*; //package imported to use split() method
-import java.lang.Integer; //package imported to do Integer conversions from String
+import java.lang.String; //imported to use String class
+import java.io.LineNumberReader; //imported to read a file line by line
+import java.io.FileReader; //imported to read a file
+import java.util.regex.*; //imported to use split() method
+import java.lang.Integer; //imported to do Integer conversions from String
 
 interface BooleanSimulator
     {
@@ -13,7 +13,7 @@ interface BooleanSimulator
         public void printStatistics();
         
         /**
-         * This method takes a primary inputlist line as a String input, assigns the values to corresponding inputs and computes outputs for all the gates, based on these inputs
+         * This method assigns the values to corresponding inputs of gates and computes outputs for all the gates, based on these inputs
          */
         public void printOutput();
     }
@@ -29,7 +29,7 @@ public class Simulator implements BooleanSimulator
     //constructor
     public Simulator(String str)
     {
-        primeInputs=str.split("\\s");
+        primeInputs=str.split("\\s");//splits line of input into individual prime inputs (Assuming, syntax is followed and inputs are separated by whitespace
     }
     
     //main method
@@ -43,7 +43,7 @@ public class Simulator implements BooleanSimulator
         String gate="a",ginput="a";
         while((gate=netLineIndex.readLine())!=null)
         {
-            count=netLineIndex.getLineNumber()-1;
+            count=netLineIndex.getLineNumber()-1; //subtracting one as the indexing starts from 1 while we want it to start from zero
             gates[count]=gate;
         }
         
@@ -59,6 +59,7 @@ public class Simulator implements BooleanSimulator
         }
     }
     
+    //To print gate statistics
     public void printStatistics()
     {
         for(int gnum=0;gnum<=count;gnum++)
@@ -72,7 +73,7 @@ public class Simulator implements BooleanSimulator
                 {
                     if(result[j].startsWith("I")==false)
                     {
-                        int input=Integer.parseInt(result[j]);
+                        int input=Integer.parseInt(result[j].trim());
                         if(input==gnum)fcount++;
                     }
                 }
@@ -81,9 +82,10 @@ public class Simulator implements BooleanSimulator
         }
     }
     
+    //to compute outputs for all gates, given particular input
+    
     public void printOutput()
     {
-        //to compute outputs for all gates, given particular input
         for(int i=0;i<=count;i++)
         {
             String result[]=gates[i].split("\\s");
@@ -98,9 +100,9 @@ public class Simulator implements BooleanSimulator
                 int temp=0;
                 if(result[j].startsWith("I"))
                 {
-                    temp=Integer.parseInt(primeInputs[Integer.parseInt((result[j].substring(1,result[j].length())))]);
+                    temp=Integer.parseInt(primeInputs[Integer.parseInt(((result[j].substring(1,result[j].length())).trim()))]);
                 }
-                else temp=isGateOutput[Integer.parseInt(result[j])];
+                else temp=isGateOutput[Integer.parseInt((result[j]).trim())];
                 if(temp==0)inputs[k]=false;
                 else inputs[k]=true;
                 if(gtype.equals("NOT"))
