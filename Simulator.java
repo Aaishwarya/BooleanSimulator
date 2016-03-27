@@ -90,7 +90,7 @@ public class Simulator implements BooleanSimulator
         {
             String result[]=gates[i].split("\\s");
             String gtype=result[1].toUpperCase();
-            boolean inputs[]=new boolean[2];
+            boolean inputs[]=new boolean[result.length-2];
             int inum=0;
             boolean boutput=false;
             
@@ -114,26 +114,36 @@ public class Simulator implements BooleanSimulator
             {
                 boutput=!(inputs[inum++]);
             }
-            else if(gtype.equals("AND"))
+            else if(gtype.equals("AND")||gtype.equals("NAND"))
             {
-                boutput=(inputs[inum++]&&inputs[inum]);
+                boolean flag=true;
+                for(int j=0;j<inputs.length;j++)
+                {
+                    flag=flag&&inputs[j];
+                }
+                if(gtype.equals("AND")){boutput=flag;}
+                if(gtype.equals("NAND")){boutput=!flag;}
             }
-            else if(gtype.equals("OR"))
+            else if(gtype.equals("OR")||gtype.equals("NOR"))
             {
-                boutput=(inputs[inum++]||inputs[inum]);
-            }
-            else if(gtype.equals("NAND"))
-            {
-                boutput=!(inputs[inum++]&&inputs[inum]);
-            }
-            else if(gtype.equals("NOR"))
-            {
-                boutput=!(inputs[inum++]||inputs[inum]);
+                boolean flag=false;
+                for(int j=0;j<inputs.length;j++)
+                {
+                    flag=flag||inputs[j];
+                }
+                if(gtype.equals("OR")){boutput=flag;}
+                if(gtype.equals("NOR")){boutput=!flag;}
             }
             else if(gtype.equals("EXOR"))
             {
-                if(inputs[inum]==inputs[++inum]) boutput=false;
-                else boutput=true;
+                int sum=0;
+                for(int j=0;j<inputs.length;j++)
+                {
+                    if(inputs[j]==true){sum+=1;}
+                    else{sum+=0;}
+                }
+                if(sum%2==0){boutput=false;}
+                else{boutput=true;}
             }
             isGateOutput[i]=((boutput==true)?1:0);
             System.out.print(isGateOutput[i]+" ");
