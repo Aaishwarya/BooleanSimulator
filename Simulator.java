@@ -89,13 +89,15 @@ public class Simulator implements BooleanSimulator
         for(int i=0;i<=count;i++)
         {
             String result[]=gates[i].split("\\s");
-            String gtype=result[1].toUpperCase();
+            String gtype="";
+            if(result.length<2){continue;}
+            else gtype=result[1].toUpperCase();
             boolean inputs[]=new boolean[result.length-2];
             int inum=0;
             boolean boutput=false;
             
             //loop to assign input values
-            for(int j=2,k=0;j<=3;j++,k++)
+            for(int j=2,k=0;j<result.length;j++,k++)
             {
                 int temp=0;
                 if(result[j].startsWith("I"))
@@ -136,13 +138,12 @@ public class Simulator implements BooleanSimulator
             }
             else if(gtype.equals("EXOR"))
             {
-                int sum=0;
+                int ocount=0;
                 for(int j=0;j<inputs.length;j++)
                 {
-                    if(inputs[j]==true){sum+=1;}
-                    else{sum+=0;}
+                    if(inputs[j]==true){ocount+=1;}
                 }
-                if(sum%2==0){boutput=false;}
+                if(ocount%2==0){boutput=false;}
                 else{boutput=true;}
             }
             isGateOutput[i]=((boutput==true)?1:0);
